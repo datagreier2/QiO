@@ -12,18 +12,54 @@ import { supportedLanguages, translations } from './translations.js'
 const HOME_PATH = '/'
 const SHOW_CERTIFICATION = false
 
+const BASE_PATH = (() => {
+  const base = import.meta.env.BASE_URL ?? HOME_PATH
+  const trimmed = base.replace(/\/+$/, '')
+  return trimmed === '' ? HOME_PATH : trimmed
+})()
+
 function normalisePath(path) {
   if (!path) {
     return HOME_PATH
   }
 
   const trimmed = path.replace(/\/+$/, '')
-  return trimmed === '' ? HOME_PATH : trimmed
+  if (trimmed === '') {
+    return HOME_PATH
+  }
+  return trimmed.startsWith('/') ? trimmed : `/${trimmed}`
+}
+
+function toRelativePath(path) {
+  const normalised = normalisePath(path)
+  if (BASE_PATH === HOME_PATH) {
+    return normalised
+  }
+  if (normalised === BASE_PATH) {
+    return HOME_PATH
+  }
+  const prefix = `${BASE_PATH}/`
+  if (normalised.startsWith(prefix)) {
+    const remainder = normalised.slice(BASE_PATH.length)
+    return remainder === '' ? HOME_PATH : remainder
+  }
+  return normalised
+}
+
+function toAbsolutePath(path) {
+  const target = normalisePath(path)
+  if (BASE_PATH === HOME_PATH) {
+    return target
+  }
+  if (target === HOME_PATH) {
+    return `${BASE_PATH}/`
+  }
+  return `${BASE_PATH}${target}`
 }
 
 const certificationSlugByLanguage = supportedLanguages.reduce(
   (accumulator, { code }) => {
-    accumulator[code] = translations[code].certification.slug
+    accumulator[code] = normalisePath(translations[code].certification.slug)
     return accumulator
   },
   {},
@@ -35,7 +71,7 @@ const certificationPaths = new Set(
 
 const membershipSlugByLanguage = supportedLanguages.reduce(
   (accumulator, { code }) => {
-    accumulator[code] = translations[code].membership.slug
+    accumulator[code] = normalisePath(translations[code].membership.slug)
     return accumulator
   },
   {},
@@ -47,7 +83,7 @@ const membershipPaths = new Set(
 
 const paymentSlugByLanguage = supportedLanguages.reduce(
   (accumulator, { code }) => {
-    accumulator[code] = translations[code].payment.slug
+    accumulator[code] = normalisePath(translations[code].payment.slug)
     return accumulator
   },
   {},
@@ -59,7 +95,7 @@ const paymentPaths = new Set(
 
 const termsSlugByLanguage = supportedLanguages.reduce(
   (accumulator, { code }) => {
-    accumulator[code] = translations[code].terms.slug
+    accumulator[code] = normalisePath(translations[code].terms.slug)
     return accumulator
   },
   {},
@@ -75,15 +111,16 @@ const resolveAssetPath = (path) => {
   }
 
   if (path.startsWith('/')) {
-    return `${import.meta.env.BASE_URL}${path.slice(1)}`
+    return toAbsolutePath(path)
   }
 
   return path
 }
+
 function getLanguageForPath(path) {
-  const target = normalisePath(path)
+  const target = toRelativePath(path)
   const certificationMatch = Object.entries(certificationSlugByLanguage).find(
-    ([, slug]) => normalisePath(slug) === target,
+    ([, slug]) => slug === target,
   )
 
   if (certificationMatch) {
@@ -91,7 +128,7 @@ function getLanguageForPath(path) {
   }
 
   const membershipMatch = Object.entries(membershipSlugByLanguage).find(
-    ([, slug]) => normalisePath(slug) === target,
+    ([, slug]) => slug === target,
   )
 
   if (membershipMatch) {
@@ -99,7 +136,7 @@ function getLanguageForPath(path) {
   }
 
   const termsMatch = Object.entries(termsSlugByLanguage).find(
-    ([, slug]) => normalisePath(slug) === target,
+    ([, slug]) => slug === target,
   )
 
   if (termsMatch) {
@@ -107,7 +144,7 @@ function getLanguageForPath(path) {
   }
 
   const paymentMatch = Object.entries(paymentSlugByLanguage).find(
-    ([, slug]) => normalisePath(slug) === target,
+    ([, slug]) => slug === target,
   )
 
   return paymentMatch?.[0]
@@ -115,13 +152,13 @@ function getLanguageForPath(path) {
 
 function App() {
   const [pathname, setPathname] = useState(() =>
-    normalisePath(window.location.pathname),
+    toRelativePath(window.location.pathname),
   )
   const [language, setLanguage] = useState(
     () => getLanguageForPath(window.location.pathname) ?? 'nb',
   )
   const [showMembershipPrompt, setShowMembershipPrompt] = useState(() =>
-    certificationPaths.has(normalisePath(window.location.pathname)),
+    certificationPaths.has(toRelativePath(window.location.pathname)),
   )
   const [overlayMembershipConfirmed, setOverlayMembershipConfirmed] =
     useState(false)
@@ -136,7 +173,7 @@ function App() {
   const courseContentRef = useRef(null)
   const [selectedMembershipCategory, setSelectedMembershipCategory] =
     useState(null)
-const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
+  const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
   const [isNavOpen, setIsNavOpen] = useState(false)
   const [sectionConfirmations, setSectionConfirmations] = useState({})
   const [quizSelections, setQuizSelections] = useState({})
@@ -233,10 +270,17 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
     }
     return requiredLessonSections.every(({ key }) => sectionConfirmations[key])
   }, [requiredLessonSections, sectionConfirmations])
-  const membershipSlug = copy.membership?.slug ?? HOME_PATH
-  const certificationSlug = copy.certification?.slug ?? HOME_PATH
-  const paymentSlug = copy.payment?.slug ?? HOME_PATH
-  const termsSlug = copy.terms?.slug ?? HOME_PATH
+  const membershipSlug = normalisePath(copy.membership?.slug ?? HOME_PATH)
+  const certificationSlug = normalisePath(
+    copy.certification?.slug ?? HOME_PATH,
+  )
+  const paymentSlug = normalisePath(copy.payment?.slug ?? HOME_PATH)
+  const termsSlug = normalisePath(copy.terms?.slug ?? HOME_PATH)
+  const homeHref = toAbsolutePath(HOME_PATH)
+  const certificationHref = toAbsolutePath(certificationSlug)
+  const membershipHref = toAbsolutePath(membershipSlug)
+  const paymentHref = toAbsolutePath(paymentSlug)
+  const termsHref = toAbsolutePath(termsSlug)
   const navCopy = {
     certification: copy.nav?.certification ?? 'Sertifisering',
     about: copy.nav?.about ?? 'Om oss',
@@ -253,15 +297,16 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
   }, [activeLocale])
 
   useEffect(() => {
-    const current = normalisePath(window.location.pathname)
-    if (current !== window.location.pathname) {
-      window.history.replaceState({}, '', current)
+    const relative = toRelativePath(window.location.pathname)
+    const absolute = toAbsolutePath(relative)
+    if (absolute !== window.location.pathname) {
+      window.history.replaceState({}, '', absolute)
     }
   }, [])
 
   useEffect(() => {
     const handlePopState = () => {
-      const newPath = normalisePath(window.location.pathname)
+      const newPath = toRelativePath(window.location.pathname)
       setPathname(newPath)
 
       const matchedLanguage = getLanguageForPath(newPath)
@@ -341,7 +386,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
         return
       }
 
-      window.history.pushState({}, '', path)
+      window.history.pushState({}, '', toAbsolutePath(target))
       setPathname(target)
     },
     [pathname],
@@ -480,7 +525,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
       <div className="topnav-inner">
         <a
           className="topnav-logo"
-          href={HOME_PATH}
+          href={homeHref}
           aria-label={navCopy.home}
           onClick={handleLogoClick}
         >
@@ -500,7 +545,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
           {SHOW_CERTIFICATION && (
             <a
               className="topnav-link"
-              href={certificationSlug}
+              href={certificationHref}
               onClick={handleCertificationNavClick}
             >
               {navCopy.certification}
@@ -515,7 +560,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
           </a>
           <a
             className="topnav-link"
-            href={`${membershipSlug}?category=donation`}
+            href={`${membershipHref}?category=donation`}
             onClick={(event) => {
               event.preventDefault()
               closeNav()
@@ -549,7 +594,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
           </div>
           <a
             className="button button-primary topnav-cta"
-            href={membershipSlug}
+            href={membershipHref}
             onClick={handleMembershipNavClick}
           >
             {navCopy.membership}
@@ -578,7 +623,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
       )}
       {copy.footer.termsLinkLabel && (
         <p>
-          <a href={termsSlug} onClick={handleFooterTermsClick}>
+          <a href={termsHref} onClick={handleFooterTermsClick}>
             {copy.footer.termsLinkLabel}
           </a>
         </p>
@@ -790,7 +835,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
     return (
       <>
         {beforeTerms}
-        <a href={termsSlug} target="_blank" rel="noreferrer">
+        <a href={termsHref} target="_blank" rel="noreferrer">
           {linkLabel}
         </a>
         {afterTerms}
@@ -1243,7 +1288,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
           <div className="hero-actions">
             <a
               className="button button-primary"
-              href={paymentSlug}
+              href={paymentHref}
               onClick={(event) => {
                 event.preventDefault()
                 navigate(paymentSlug)
@@ -1254,10 +1299,10 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
             {SHOW_CERTIFICATION && membershipCopy.hero.secondaryCta && (
               <a
                 className="button button-ghost"
-                href={copy.certification.slug}
-                onClick={(event) => {
+                href={certificationHref}
+                  onClick={(event) => {
                   event.preventDefault()
-                  navigate(copy.certification.slug)
+                  navigate(certificationSlug)
                 }}
               >
                 {membershipCopy.hero.secondaryCta}
@@ -1649,7 +1694,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
           <h1>{copy.hero.title}</h1>
           <p className="hero-lead">{copy.hero.lead}</p>
           <div className="hero-actions">
-            <a className="button button-primary" href={copy.membership.slug}>
+            <a className="button button-primary" href={membershipHref}>
               {copy.hero.primaryCta}
             </a>
           </div>
@@ -1667,7 +1712,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
                 <div className="section-actions">
                   <a
                     className="button button-primary"
-                    href={certificationSlug}
+                    href={certificationHref}
                     onClick={(event) => {
                       event.preventDefault()
                       navigate(certificationSlug)
