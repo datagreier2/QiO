@@ -3,12 +3,18 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
-export default defineConfig(({ command }) => ({
-  base:
+export default defineConfig(({ command }) => {
+  const hasCname =
+    existsSync('CNAME') || existsSync('public/CNAME') || existsSync('./public/CNAME')
+  const base =
     command === 'build'
-      ? existsSync('CNAME')
+      ? hasCname
         ? '/'
         : '/QiO/'
-      : '/',
-  plugins: [react()],
-}))
+      : '/'
+
+  return {
+    base,
+    plugins: [react()],
+  }
+})

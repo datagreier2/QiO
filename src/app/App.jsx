@@ -160,9 +160,6 @@ function App() {
   const [showMembershipPrompt, setShowMembershipPrompt] = useState(() =>
     certificationPaths.has(toRelativePath(window.location.pathname)),
   )
-  const [overlayMembershipConfirmed, setOverlayMembershipConfirmed] =
-    useState(false)
-  const [overlayError, setOverlayError] = useState('')
   const [showEnrollment, setShowEnrollment] = useState(false)
   const [enrollmentEmail, setEnrollmentEmail] = useState('')
   const [enrollmentError, setEnrollmentError] = useState('')
@@ -199,7 +196,10 @@ function App() {
   const paymentCopy = isPaymentPage ? copy.payment : null
   const isTermsPage = termsPaths.has(pathname)
   const termsCopy = isTermsPage ? copy.terms : null
-  const membershipSections = membershipCopy?.sections ?? []
+  const membershipSections = useMemo(
+    () => membershipCopy?.sections ?? [],
+    [membershipCopy],
+  )
   const membershipCategoryOptions = useMemo(() => {
     if (!membershipCopy) {
       return []
@@ -327,8 +327,6 @@ function App() {
   useEffect(() => {
     if (certificationPaths.has(pathname)) {
       setShowMembershipPrompt(true)
-      setOverlayMembershipConfirmed(false)
-      setOverlayError('')
     } else {
       setShowMembershipPrompt(false)
       setActiveModule(null)
@@ -338,8 +336,6 @@ function App() {
       setShowVerification(false)
       setVerificationPlace('')
       setVerificationError('')
-      setOverlayMembershipConfirmed(false)
-      setOverlayError('')
       setSelectedMembershipCategory(null)
       setSectionConfirmations({})
       setQuizSelections({})
@@ -509,14 +505,10 @@ function App() {
     [
       closeNav,
       isCertificationPage,
-      certificationSlugByLanguage,
       navigate,
       isMembershipPage,
-      membershipSlugByLanguage,
       isTermsPage,
-      termsSlugByLanguage,
       isPaymentPage,
-      paymentSlugByLanguage,
     ],
   )
 
@@ -631,12 +623,6 @@ function App() {
     </footer>
   )
 
-  const dismissOverlay = useCallback(() => {
-    setShowMembershipPrompt(false)
-    setOverlayMembershipConfirmed(false)
-    setOverlayError('')
-  }, [])
-
   const handleStartCourse = () => {
     setShowMembershipPrompt(false)
     setEnrollmentError('')
@@ -653,14 +639,11 @@ function App() {
 
   const handleOverlayConfirm = useCallback(() => {
     setShowMembershipPrompt(false)
-    setOverlayError('')
-    setOverlayMembershipConfirmed(true)
   }, [])
 
   const handleOverlayNavigate = useCallback(
     (target) => {
       setShowMembershipPrompt(false)
-      setOverlayError('')
       navigate(target)
     },
     [navigate],
