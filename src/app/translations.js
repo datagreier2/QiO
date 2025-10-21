@@ -867,7 +867,7 @@ export const translations = {
       title: 'QiO grows the quiz community',
       lead:
         'QiO is a non-profit dedicated to developing the quiz culture in Norway, with Oslo as its home base. We build meeting places, train quiz hosts, and connect teams with new venues.',
-      primaryCta: 'Join the network',
+      primaryCta: 'Join us',
     },
     info: {
       heading: 'Become a certified quizmaster',
