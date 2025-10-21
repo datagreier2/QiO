@@ -69,6 +69,17 @@ const termsPaths = new Set(
   Object.values(termsSlugByLanguage).map((slug) => normalisePath(slug)),
 )
 
+const resolveAssetPath = (path) => {
+  if (!path) {
+    return path
+  }
+
+  if (path.startsWith('/')) {
+    return `${import.meta.env.BASE_URL}${path.slice(1)}`
+  }
+
+  return path
+}
 function getLanguageForPath(path) {
   const target = normalisePath(path)
   const certificationMatch = Object.entries(certificationSlugByLanguage).find(
@@ -235,6 +246,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
     toggleLabel: copy.nav?.toggleLabel ?? 'Meny',
     home: copy.nav?.home ?? 'Til forsiden',
   }
+  const logoSrc = resolveAssetPath('/qio_logo.svg')
 
   useEffect(() => {
     document.documentElement.setAttribute('lang', activeLocale)
@@ -472,7 +484,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
           aria-label={navCopy.home}
           onClick={handleLogoClick}
         >
-          <img src="/qio_logo.svg" alt="Quiz i Oslo logo" />
+          <img src={logoSrc} alt="Quiz i Oslo logo" />
         </a>
         <button
           type="button"
@@ -809,7 +821,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
             <div className="lesson-topbar-left">
               <img
                 className="hero-logo"
-                src="/qio_logo.svg"
+                src={logoSrc}
                 alt="Quiz i Oslo logo"
               />
             </div>
@@ -837,7 +849,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
             <div className="hero-header">
               <img
                 className="hero-logo"
-                src="/qio_logo.svg"
+                src={logoSrc}
                 alt="Quiz i Oslo logo"
               />
             </div>
@@ -1160,6 +1172,10 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
   }
 
   if (isTermsPage && termsCopy) {
+    const termsDownloadHref = resolveAssetPath(
+      termsCopy.downloadHref ?? '/Salgsvilkaar.pdf',
+    )
+
     return (
       <>
         {topNavigation}
@@ -1168,7 +1184,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
             <div className="hero-header">
               <img
                 className="hero-logo"
-                src="/qio_logo.svg"
+                src={logoSrc}
                 alt="Quiz i Oslo logo"
               />
             </div>
@@ -1181,7 +1197,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
               <div className="hero-actions">
                 <a
                   className="button button-ghost"
-                  href={termsCopy.downloadHref ?? '/Salgsvilkaar.pdf'}
+                  href={termsDownloadHref}
                   target="_blank"
                   rel="noreferrer"
                   download
@@ -1219,7 +1235,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
         <div className="page">
         <header className="hero">
           <div className="hero-header">
-            <img className="hero-logo" src="/qio_logo.svg" alt="Quiz i Oslo logo" />
+            <img className="hero-logo" src={logoSrc} alt="Quiz i Oslo logo" />
           </div>
           <p className="hero-eyebrow">{membershipCopy.hero.eyebrow}</p>
           <h1>{membershipCopy.hero.title}</h1>
@@ -1290,13 +1306,13 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
                       `membership-section-${index}-paragraph-${paragraphIndex}`,
                     ),
                   )}
-                  {section.image && (
-                    <img
-                      className="membership-section-image"
-                      src={section.image}
-                      alt={section.imageAlt ?? ''}
-                    />
-                  )}
+                {section.image && (
+                  <img
+                    className="membership-section-image"
+                    src={resolveAssetPath(section.image)}
+                    alt={section.imageAlt ?? ''}
+                  />
+                )}
                 {section.items &&
                   (section.ordered ? (
                     <ol>
@@ -1627,7 +1643,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
       <div className="page">
         <header className="hero">
           <div className="hero-header">
-            <img className="hero-logo" src="/qio_logo.svg" alt="Quiz i Oslo logo" />
+            <img className="hero-logo" src={logoSrc} alt="Quiz i Oslo logo" />
           </div>
           <p className="hero-eyebrow">{copy.hero.eyebrow}</p>
           <h1>{copy.hero.title}</h1>
