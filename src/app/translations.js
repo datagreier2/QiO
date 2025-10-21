@@ -15,6 +15,7 @@ export const translations = {
       about: 'Om oss',
       membership: 'Bli medlem',
       donation: 'Donasjon',
+      terms: 'Salgsvilkår',
       toggleLabel: 'Meny',
       home: 'Til forsiden',
     },
@@ -28,11 +29,10 @@ export const translations = {
     info: {
       heading: 'Bli sertifisert quizmaster',
       paragraphs: [
-        'Delta på QiOs sertifiseringsprogram og lær hvordan du planlegger, skriver og leder profesjonelle quizkvelder. Programmet kombinerer digitale moduler med praktiske øvelser sammen med erfarne instruktører.',
-        'Send en e-post til {email} med navnet ditt og noen linjer om erfaringen din, så får du informasjon om neste kursrunde og kriteriene for sertifisering.',
+        'Delta på QiOs sertifiseringsprogram for å bekrefte din kunnskap og kanskje lære noe du ikke har tenkt på. Sertifisering består av bekreftelse av gjennomført quiz, et tilfeldig utvalg kursmodudler fra vår kursdatabase, med en oppfølgende prøve som beviser at innholdet er lest og forstått.',
+
       ],
-      tip: 'Tips: Vi prioriterer deltakere som allerede arrangerer quiz eller har et samarbeidende utested.',
-      email: 'hei@quizioslo.no',
+      tip: 'Sertifiserings er gratis. Den tekniske løsningen er ikke helt ferdigstilt, men vil havne på denne nettsiden innen utgangen av 2025.',
     },
     certification: {
       slug: '/sertifisering',
@@ -654,7 +654,7 @@ export const translations = {
           description: 'Som bedriftsmedlem får du',
           items: [
             'Tilgang til arrangementer for alle ansatte i bedriften',
-            'Generelle tips og råd til arrangementssteder (sertifisering kommer))',
+            'Generelle tips og råd til arrangement (sertifisering kommer))',
             'Tips og råd om hvordan gjøre arrangementer tilgjengelige for flere',
           ],
         },
@@ -742,6 +742,8 @@ export const translations = {
         emailPlaceholder: 'navn@example.com',
         consentLabel:
           'Jeg godtar oppbevaring av personopplysninger og digital kommunikasjon.',
+        termsConsentLabel: 'Jeg godtar {terms}',
+        termsLinkLabel: 'salgsvilkårene',
       },
       instructions: {
         heading: 'Slik betaler du med Vipps',
@@ -773,11 +775,76 @@ export const translations = {
           'mailto:hei@quizioslo.no?subject=Sp%C3%B8rsm%C3%A5l%20om%20medlemsbetaling',
       },
     },
+    terms: {
+      slug: '/salgsvilkar',
+      heading: 'Salgsvilkår for Quiz i Oslo',
+      hero: {
+        title: 'Salgsvilkår',
+        lead:
+          'Disse vilkårene gjelder for kjøp av medlemskap i foreningen Quiz i Oslo (organisasjonsnummer 933 380 041).',
+      },
+      downloadLabel: 'Last ned salgsvilkårene (PDF)',
+      downloadHref: '/Salgsvilkaar.pdf',
+      sections: [
+        {
+          heading: 'Parter',
+          paragraphs: [
+            'Selger er:\nQuiz i Oslo\nOrganisasjonsnummer: 933 380 041\nAdresse: Schweigaards gate 60B\nE-post: qioforeningen@gmail.com\nTelefon: 4669313O',
+            'Kjøper er den personen som registrerer seg som medlem og betaler kontingent via vår nettside.',
+          ],
+        },
+        {
+          heading: 'Betaling',
+          paragraphs: [
+            'Medlemskontingent betales med Vipps eller annen tilgjengelig betalingsløsning. Betalingen registreres umiddelbart, og medlemskapet aktiveres når betalingen er gjennomført.',
+          ],
+        },
+        {
+          heading: 'Levering',
+          paragraphs: [
+            'Medlemskapet gjelder fra det tidspunktet betalingen er registrert og gir tilgang til medlemsfordeler som beskrevet på vår nettside.',
+          ],
+        },
+        {
+          heading: 'Angrerett',
+          paragraphs: [
+            'Som hovedregel gjelder angrerettloven for forbrukerkjøp. Ved kjøp av medlemskap i en ideell forening gjelder angreretten i 14 dager fra kjøpsdato dersom medlemskapet ikke er tatt i bruk. For å benytte angreretten må du kontakte oss skriftlig på e-post innen fristen.',
+          ],
+        },
+        {
+          heading: 'Retur',
+          paragraphs: [
+            'Siden medlemskap ikke er en fysisk vare, gjelder ikke returrett utover angreretten.',
+          ],
+        },
+        {
+          heading: 'Reklamasjonshåndtering',
+          paragraphs: [
+            'Dersom det oppstår feil eller mangler knyttet til registreringen eller leveringen av medlemskapet, ber vi deg kontakte oss så snart som mulig på e-post. Vi vil behandle henvendelsen innen rimelig tid og sørge for en løsning.',
+          ],
+        },
+        {
+          heading: 'Medlemskap – fornyelse og oppsigelse',
+          paragraphs: [
+            'Medlemskapet fornyes automatisk hver 12. måned via samme betalingsmåte som ble brukt ved innmelding. Du vil få varsel i forkant av fornyelsen.',
+            'Du kan når som helst si opp medlemskapet ved å kontakte oss på e-post. Oppsigelsen trer i kraft ved utløpet av inneværende medlemsperiode, og videre betalinger vil da stoppe.',
+            'Endringer av kontaktinformasjon eller medlemskategori gjøres ved å kontakte oss på e-post.',
+          ],
+        },
+        {
+          heading: 'Konfliktløsning',
+          paragraphs: [
+            'Vi ønsker å løse eventuelle tvister i minnelighet. Dersom dette ikke lykkes, kan saken bringes inn for Forbrukerrådet eller ordinær domstolsbehandling etter norsk lov.',
+          ],
+        },
+      ],
+    },
     footer: {
       rights: '© {year} Quiz i Oslo. Alle rettigheter forbeholdt.',
       follow: 'Følg oss på',
       socialName: 'Instagram',
-      socialHint: 'for hint og konkurranser.',
+      socialHint: 'for teasere og giveaways.',
+      termsLinkLabel: 'Salgsvilkår',
     },
   },
   en: {
@@ -791,6 +858,7 @@ export const translations = {
       about: 'About',
       membership: 'Join QiO',
       donation: 'Donation',
+      terms: 'Terms of Sale',
       toggleLabel: 'Menu',
       home: 'Go to homepage',
     },
@@ -1518,6 +1586,8 @@ export const translations = {
         emailPlaceholder: 'name@example.com',
         consentLabel:
           'I agree to data storage and digital communication.',
+        termsConsentLabel: 'I accept the {terms}',
+        termsLinkLabel: 'terms of sale',
       },
       instructions: {
         heading: 'How to pay with Vipps',
@@ -1548,11 +1618,76 @@ export const translations = {
           'mailto:hei@quizioslo.no?subject=Membership%20payment%20question',
       },
     },
+    terms: {
+      slug: '/terms-of-sale',
+      heading: 'Terms of Sale for Quiz i Oslo',
+      hero: {
+        title: 'Terms of Sale',
+        lead:
+          'These terms apply to the purchase of memberships in the Quiz i Oslo association (organisation number 933 380 041).',
+      },
+      downloadLabel: 'Download terms of sale (PDF)',
+      downloadHref: '/Salgsvilkaar.pdf',
+      sections: [
+        {
+          heading: 'Parties',
+          paragraphs: [
+            'The seller is:\nQuiz i Oslo\nOrganisation number: 933 380 041\nAddress: Schweigaards gate 60B\nEmail: qioforeningen@gmail.com\nPhone: 4669313O',
+            'The buyer is the person who registers as a member and pays the membership fee through our website.',
+          ],
+        },
+        {
+          heading: 'Payment',
+          paragraphs: [
+            'Membership fees are paid with Vipps or another available payment provider. The payment is registered immediately, and the membership activates once the transaction is completed.',
+          ],
+        },
+        {
+          heading: 'Delivery',
+          paragraphs: [
+            'The membership is valid from the moment the payment is registered and grants access to the member benefits described on our website.',
+          ],
+        },
+        {
+          heading: 'Right of withdrawal',
+          paragraphs: [
+            'The Right of Withdrawal Act applies to consumer purchases. For memberships in a non-profit association, the right of withdrawal applies for 14 days from the purchase date provided the membership has not been used. To exercise this right, contact us in writing by email within the deadline.',
+          ],
+        },
+        {
+          heading: 'Returns',
+          paragraphs: [
+            'Because membership is not a physical product, no return right applies beyond the right of withdrawal.',
+          ],
+        },
+        {
+          heading: 'Handling complaints',
+          paragraphs: [
+            'If you experience errors or issues related to the registration or delivery of the membership, contact us by email as soon as possible. We will process your inquiry within a reasonable time and provide a solution.',
+          ],
+        },
+        {
+          heading: 'Membership renewal and cancellation',
+          paragraphs: [
+            'Membership renews automatically every 12 months using the same payment method you used when joining. You will receive a notice ahead of the renewal.',
+            'You may cancel your membership at any time by contacting us by email. The cancellation takes effect at the end of the current membership period, and future payments will stop.',
+            'To update your contact information or membership category, please contact us by email.',
+          ],
+        },
+        {
+          heading: 'Dispute resolution',
+          paragraphs: [
+            'We aim to resolve any disputes amicably. If that is not possible, the case can be brought before the Norwegian Consumer Council or the ordinary courts under Norwegian law.',
+          ],
+        },
+      ],
+    },
     footer: {
       rights: '© {year} Quiz in Oslo. All rights reserved.',
       follow: 'Follow us on',
       socialName: 'Instagram',
       socialHint: 'for teasers and giveaways.',
+      termsLinkLabel: 'Terms of sale',
     },
   },
 }

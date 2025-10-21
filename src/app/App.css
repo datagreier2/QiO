@@ -510,7 +510,7 @@ a {
   border-top: none;
   padding-top: 1.5rem;
   font-size: 0.9rem;
-  color: var(--text-color);
+  color: #fff;
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
@@ -1024,6 +1024,19 @@ a {
 
 .payment-form-consent input {
   margin-top: 0.25rem;
+}
+
+.payment-form-consent a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.payment-form-consent a:hover {
+  opacity: 0.8;
+}
+
+.payment-form-consent + .payment-form-consent {
+  margin-top: 0.75rem;
 }
 
 .payment-selected-header {

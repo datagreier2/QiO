@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import './App.css'
 import { supportedLanguages, translations } from './translations.js'
 
@@ -50,6 +57,18 @@ const paymentPaths = new Set(
   Object.values(paymentSlugByLanguage).map((slug) => normalisePath(slug)),
 )
 
+const termsSlugByLanguage = supportedLanguages.reduce(
+  (accumulator, { code }) => {
+    accumulator[code] = translations[code].terms.slug
+    return accumulator
+  },
+  {},
+)
+
+const termsPaths = new Set(
+  Object.values(termsSlugByLanguage).map((slug) => normalisePath(slug)),
+)
+
 function getLanguageForPath(path) {
   const target = normalisePath(path)
   const certificationMatch = Object.entries(certificationSlugByLanguage).find(
@@ -66,6 +85,14 @@ function getLanguageForPath(path) {
 
   if (membershipMatch) {
     return membershipMatch[0]
+  }
+
+  const termsMatch = Object.entries(termsSlugByLanguage).find(
+    ([, slug]) => normalisePath(slug) === target,
+  )
+
+  if (termsMatch) {
+    return termsMatch[0]
   }
 
   const paymentMatch = Object.entries(paymentSlugByLanguage).find(
@@ -109,6 +136,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
   const [paymentPhone, setPaymentPhone] = useState('')
   const [paymentEmail, setPaymentEmail] = useState('')
   const [paymentConsent, setPaymentConsent] = useState(false)
+  const [paymentTermsAccepted, setPaymentTermsAccepted] = useState(false)
 
   const copy = useMemo(() => translations[language], [language])
   const activeLocale =
@@ -121,6 +149,8 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
   const membershipCopy = isMembershipPage ? copy.membership : null
   const isPaymentPage = paymentPaths.has(pathname)
   const paymentCopy = isPaymentPage ? copy.payment : null
+  const isTermsPage = termsPaths.has(pathname)
+  const termsCopy = isTermsPage ? copy.terms : null
   const membershipSections = membershipCopy?.sections ?? []
   const membershipCategoryOptions = useMemo(() => {
     if (!membershipCopy) {
@@ -195,6 +225,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
   const membershipSlug = copy.membership?.slug ?? HOME_PATH
   const certificationSlug = copy.certification?.slug ?? HOME_PATH
   const paymentSlug = copy.payment?.slug ?? HOME_PATH
+  const termsSlug = copy.terms?.slug ?? HOME_PATH
   const navCopy = {
     certification: copy.nav?.certification ?? 'Sertifisering',
     about: copy.nav?.about ?? 'Om oss',
@@ -289,6 +320,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
     setPaymentPhone('')
     setPaymentEmail('')
     setPaymentConsent(false)
+    setPaymentTermsAccepted(false)
   }, [paymentCopy])
   const navigate = useCallback(
     (path) => {
@@ -359,6 +391,24 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
     [closeNav, navigate, pathname],
   )
 
+  const handleFooterTermsClick = useCallback(
+    (event) => {
+      if (
+        event.metaKey ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.button !== 0
+      ) {
+        return
+      }
+
+      event.preventDefault()
+      navigate(termsSlug)
+    },
+    [navigate, termsSlug],
+  )
+
   const handleLanguageChange = useCallback(
     (event) => {
       closeNav()
@@ -383,6 +433,14 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
         return
       }
 
+      if (isTermsPage) {
+        const targetSlug = termsSlugByLanguage[nextLanguage]
+        if (targetSlug) {
+          navigate(targetSlug)
+        }
+        return
+      }
+
       if (isPaymentPage) {
         const targetSlug = paymentSlugByLanguage[nextLanguage]
         if (targetSlug) {
@@ -398,6 +456,8 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
       navigate,
       isMembershipPage,
       membershipSlugByLanguage,
+      isTermsPage,
+      termsSlugByLanguage,
       isPaymentPage,
       paymentSlugByLanguage,
     ],
@@ -485,6 +545,33 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
         </nav>
       </div>
     </header>
+  )
+
+  const footerContent = (
+    <footer className="footer">
+      <p>{copy.footer.rights.replace('{year}', year)}</p>
+      {copy.footer.follow && copy.footer.socialName && (
+        <p>
+          {copy.footer.follow}{' '}
+          <a href="https://instagram.com" target="_blank" rel="noreferrer">
+            {copy.footer.socialName}
+          </a>
+          {copy.footer.socialHint && (
+            <>
+              {' '}
+              {copy.footer.socialHint}
+            </>
+          )}
+        </p>
+      )}
+      {copy.footer.termsLinkLabel && (
+        <p>
+          <a href={termsSlug} onClick={handleFooterTermsClick}>
+            {copy.footer.termsLinkLabel}
+          </a>
+        </p>
+      )}
+    </footer>
   )
 
   const dismissOverlay = useCallback(() => {
@@ -656,6 +743,46 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
         <a href={`mailto:${email}`}>{email}</a>
         {afterEmail}
       </p>
+    )
+  }
+
+  const renderParagraphWithLineBreaks = (text, key) => {
+    const segments = text.split('\n')
+    return (
+      <p key={key}>
+        {segments.map((segment, index) =>
+          index === 0 ? (
+            segment
+          ) : (
+            <Fragment key={`${key}-line-${index}`}>
+              <br />
+              {segment}
+            </Fragment>
+          ),
+        )}
+      </p>
+    )
+  }
+
+  const renderTermsConsentLabel = (label, linkLabel) => {
+    if (!label) {
+      return null
+    }
+
+    const placeholder = '{terms}'
+    if (!linkLabel || !label.includes(placeholder)) {
+      return label
+    }
+
+    const [beforeTerms, afterTerms] = label.split(placeholder)
+    return (
+      <>
+        {beforeTerms}
+        <a href={termsSlug} target="_blank" rel="noreferrer">
+          {linkLabel}
+        </a>
+        {afterTerms}
+      </>
     )
   }
 
@@ -1000,16 +1127,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
           )}
         </main>
 
-        <footer className="footer">
-          <p>{copy.footer.rights.replace('{year}', year)}</p>
-          <p>
-            {copy.footer.follow}{' '}
-            <a href="https://instagram.com" target="_blank" rel="noreferrer">
-              {copy.footer.socialName}
-            </a>{' '}
-            {copy.footer.socialHint}
-          </p>
-        </footer>
+        {footerContent}
 
         {showMembershipPrompt && (
           <div className="overlay" role="dialog" aria-modal="true">
@@ -1037,6 +1155,59 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
           </div>
         )}
       </div>
+      </>
+    )
+  }
+
+  if (isTermsPage && termsCopy) {
+    return (
+      <>
+        {topNavigation}
+        <div className="page">
+          <header className="hero">
+            <div className="hero-header">
+              <img
+                className="hero-logo"
+                src="/qio_logo.svg"
+                alt="Quiz i Oslo logo"
+              />
+            </div>
+            {termsCopy.heading && (
+              <p className="hero-eyebrow">{termsCopy.heading}</p>
+            )}
+            <h1>{termsCopy.hero.title}</h1>
+            <p className="hero-lead">{termsCopy.hero.lead}</p>
+            {termsCopy.downloadLabel && (
+              <div className="hero-actions">
+                <a
+                  className="button button-ghost"
+                  href={termsCopy.downloadHref ?? '/Salgsvilkaar.pdf'}
+                  target="_blank"
+                  rel="noreferrer"
+                  download
+                >
+                  {termsCopy.downloadLabel}
+                </a>
+              </div>
+            )}
+          </header>
+          <main className="content">
+            {termsCopy.sections?.map((section, index) => (
+              <section className="card section" key={`terms-section-${index}`}>
+                <div className="section-header">
+                  <h2>{section.heading}</h2>
+                </div>
+                {section.paragraphs?.map((paragraph, paragraphIndex) =>
+                  renderParagraphWithLineBreaks(
+                    paragraph,
+                    `terms-section-${index}-paragraph-${paragraphIndex}`,
+                  ),
+                )}
+              </section>
+            ))}
+          </main>
+          {footerContent}
+        </div>
       </>
     )
   }
@@ -1159,16 +1330,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
           ))}
         </main>
 
-        <footer className="footer">
-          <p>{copy.footer.rights.replace('{year}', year)}</p>
-          <p>
-            {copy.footer.follow}{' '}
-            <a href="https://instagram.com" target="_blank" rel="noreferrer">
-              {copy.footer.socialName}
-            </a>{' '}
-            {copy.footer.socialHint}
-          </p>
-        </footer>
+        {footerContent}
       </div>
       </>
     )
@@ -1328,14 +1490,37 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
                                 }
                                 placeholder={paymentFormCopy.emailPlaceholder}
                                 required
-                              />
-                            </label>
-                          </div>
-                          <label className="payment-form-consent" htmlFor="payment-consent">
+                          />
+                        </label>
+                      </div>
+                      {paymentFormCopy.termsConsentLabel &&
+                        paymentFormCopy.termsLinkLabel && (
+                          <label
+                            className="payment-form-consent"
+                            htmlFor="payment-terms"
+                          >
                             <input
-                              id="payment-consent"
+                              id="payment-terms"
                               type="checkbox"
-                              checked={paymentConsent}
+                              checked={paymentTermsAccepted}
+                              onChange={(event) =>
+                                setPaymentTermsAccepted(event.target.checked)
+                              }
+                              required
+                            />
+                            <span>
+                              {renderTermsConsentLabel(
+                                paymentFormCopy.termsConsentLabel,
+                                paymentFormCopy.termsLinkLabel,
+                              )}
+                            </span>
+                          </label>
+                        )}
+                      <label className="payment-form-consent" htmlFor="payment-consent">
+                        <input
+                          id="payment-consent"
+                          type="checkbox"
+                          checked={paymentConsent}
                               onChange={(event) =>
                                 setPaymentConsent(event.target.checked)
                               }
@@ -1430,16 +1615,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
             )}
           </main>
 
-          <footer className="footer">
-            <p>{copy.footer.rights.replace('{year}', year)}</p>
-            <p>
-              {copy.footer.follow}{' '}
-              <a href="https://instagram.com" target="_blank" rel="noreferrer">
-                {copy.footer.socialName}
-              </a>{' '}
-              {copy.footer.socialHint}
-            </p>
-          </footer>
+          {footerContent}
         </div>
       </>
     )
@@ -1488,16 +1664,7 @@ const [selectedPaymentOptionId, setSelectedPaymentOptionId] = useState(null)
           </section>
         </main>
 
-        <footer className="footer">
-          <p>{copy.footer.rights.replace('{year}', year)}</p>
-          <p>
-            {copy.footer.follow}{' '}
-            <a href="https://instagram.com" target="_blank" rel="noreferrer">
-              {copy.footer.socialName}
-            </a>{' '}
-            {copy.footer.socialHint}
-          </p>
-        </footer>
+        {footerContent}
       </div>
       </>
     )
