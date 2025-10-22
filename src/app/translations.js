@@ -675,8 +675,8 @@ export const translations = {
           category: 'donation',
           disableActions: true,
           description:
-            'Du kan donere til foreningen ved å bruke Vipps-nummer XXXXXX.',
-          image: '/Vipps_QR.png',
+            'Du kan donere til foreningen ved å bruke Vipps-nummer 28030.',
+          image: '/QR-28030.png',
           imageAlt: 'Vipps QR-kode for QiO',
           paragraphs: [
             'Skann QR-koden eller søk etter nummeret i appen og velg beløpet du ønsker å bidra med. Takk for støtten! '
@@ -1520,7 +1520,7 @@ export const translations = {
           disableActions: true,
           description:
             'You can support the association by using Vipps number 933108.',
-          image: '/Vipps_QR.png',
+          image: '/QR-28030.png',
           imageAlt: 'Vipps QR code for QiO',
           paragraphs: [
             'Scan the QR code or search for the number in the app and choose your donation amount. Thank you for the support!'
