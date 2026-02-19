@@ -690,7 +690,7 @@ export const translations = {
         eyebrow: 'Medlemsbetaling',
         title: 'Fullfør QiO-medlemskapet ditt',
         lead:
-          'Betal årsavgiften for å aktivere medlemskapet. Merk betalingen med navnet ditt slik at vi finner deg i registeret.',
+          'Betal årsavgiften for å aktivere medlemskapet. Merk betalingen med navnet ditt slik at vi finner deg i registeret. Betaling fungerer ikke ennå 😅 Vi prøver å finne en utvikler som kan hjelpe oss med å få betalingsløsningen på plass.',
         primaryCtaHref: 'https://vipps.no/',
         payLabel: 'Registrer og betal',
       },
@@ -1534,7 +1534,7 @@ export const translations = {
         eyebrow: 'Membership payment',
         title: 'Complete your QiO membership',
         lead:
-          'Pay the annual fee to activate your membership. Include your name so we can match the payment to your registration.',
+          'Pay the annual fee to activate your membership. Include your name so we can match the payment to your registration. Payments are not working yet 😅 We are trying to find a developer who can help us get the payment solution up and running.',
         primaryCtaHref: 'https://vipps.no/',
         payLabel: 'Register and pay',
       },
